@@ -233,3 +233,206 @@ body {
   outline: 2px solid var(--aksen);
   outline-offset: 2px;
 }
+
+/* =====================================================================
+   TAHAP 2 — Tangkap Cepat & Pilah Cepat
+   ===================================================================== */
+
+:root {
+  --tombol-besar:   56px;   /* tinggi minimal tombol utama (§4.3) */
+  --info-latar:     #e7f0fb;
+  --info-teks:      #1c4e8a;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --info-latar:   #1b2c40;
+    --info-teks:    #a8c8ee;
+  }
+}
+
+/* Saat berada di layar selain daftar, kotak capture bawah disembunyikan,
+   jadi ruang kosong di bawah halaman tidak diperlukan lagi. */
+body.tanpa-capture { padding-bottom: 24px; }
+
+/* ---------- BANNER ANTREAN PILAH ---------- */
+.banner-pilah {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 12px;
+  padding: 12px 14px;
+  background: var(--info-latar);
+  color: var(--info-teks);
+  border-radius: var(--sudut);
+  font-size: 15px;
+}
+
+/* ---------- TOMBOL ---------- */
+.tombol-tangkap {
+  display: block;
+  width: 100%;
+  min-height: var(--tombol-besar);
+  margin-top: 12px;
+  background: transparent;
+  color: var(--aksen);
+  border: 2px dashed var(--garis);
+  border-radius: var(--sudut);
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+  transition: border-color var(--jeda) ease;
+}
+
+.tombol-tangkap:hover { border-color: var(--aksen); }
+
+.tombol-besar {
+  display: block;
+  width: 100%;
+  min-height: var(--tombol-besar);
+  margin-top: 12px;
+  padding: 0 16px;
+  background: var(--aksen);
+  color: var(--aksen-teks);
+  border: 0;
+  border-radius: var(--sudut);
+  font: inherit;
+  font-size: 17px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity var(--jeda) ease;
+}
+
+.tombol-besar:active { opacity: 0.8; }
+
+.tombol-besar--sekunder {
+  background: transparent;
+  color: var(--aksen);
+  border: 1px solid var(--garis);
+}
+
+.tombol-besar--bahaya {
+  background: transparent;
+  color: var(--bahaya-teks);
+  border: 1px solid var(--garis);
+}
+
+/* Tombol berupa teks saja, untuk navigasi ringan */
+.tombol-teks {
+  min-height: var(--sentuh);
+  padding: 0 4px;
+  background: none;
+  border: 0;
+  color: var(--aksen);
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.baris-layar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+/* ---------- LAYAR TANGKAP CEPAT ---------- */
+.area-tangkap,
+.judul-pilah {
+  display: block;
+  width: 100%;
+  padding: 12px;
+  background: var(--latar-kartu);
+  color: var(--teks);
+  border: 1px solid var(--garis);
+  border-radius: var(--sudut);
+  font: inherit;
+  line-height: 1.5;
+  resize: vertical;
+}
+
+.area-tangkap { font-size: 17px; }
+
+.area-tangkap:focus,
+.judul-pilah:focus {
+  outline: 2px solid var(--aksen);
+  outline-offset: 1px;
+}
+
+/* ---------- LAYAR PILAH CEPAT ---------- */
+.judul-pilah {
+  margin-bottom: 4px;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.tanya {
+  margin: 18px 0 8px;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--teks-redup);
+}
+
+/* Tombol pilihan dibagi rata selebar layar agar mudah diketuk ibu jari */
+.grup-tombol {
+  display: flex;
+  gap: 8px;
+}
+
+.pilihan {
+  flex: 1;
+  min-height: var(--sentuh);
+  padding: 0 4px;
+  background: var(--latar-kartu);
+  color: var(--teks);
+  border: 1px solid var(--garis);
+  border-radius: var(--sudut);
+  font: inherit;
+  cursor: pointer;
+  transition: background var(--jeda) ease, border-color var(--jeda) ease;
+}
+
+.pilihan--aktif {
+  background: var(--aksen);
+  color: var(--aksen-teks);
+  border-color: var(--aksen);
+  font-weight: 600;
+}
+
+/* Dipakai saat "Kapan?" dimatikan karena jenisnya Catatan */
+.tidak-aktif {
+  opacity: 0.4;
+  pointer-events: none;
+}
+
+.aksi-pilah { margin-top: 24px; }
+
+/* ---------- PENANDA & TOAST ---------- */
+.tanda-belum-dipilah {
+  flex: 0 0 auto;
+  padding: 2px 8px;
+  background: var(--info-latar);
+  color: var(--info-teks);
+  border-radius: 999px;
+  font-size: 11px;
+  white-space: nowrap;
+}
+
+.toast {
+  position: fixed;
+  left: 50%;
+  bottom: calc(84px + env(safe-area-inset-bottom));
+  transform: translateX(-50%);
+  z-index: 10;
+  max-width: calc(100vw - 32px);
+  padding: 12px 18px;
+  background: var(--teks);
+  color: var(--latar);
+  border-radius: 999px;
+  font-size: 14px;
+  text-align: center;
+}

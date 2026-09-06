@@ -3,22 +3,29 @@
 Pencatat agenda & task sederhana. Web statis, tanpa server, tanpa akun.
 Data disimpan di IndexedDB — **hanya di browser perangkat ini**, tidak pernah dikirim ke mana pun.
 
-Status saat ini: **Tahap 1 selesai** (lihat §8 PRD).
+Status saat ini: **Tahap 2 selesai** (lihat §8 PRD).
 
 ---
 
 ## Yang sudah bisa dipakai
 
-- Menulis item baru (judul saja) lewat kotak di bawah layar
-- Melihat daftar item aktif
-- Menandai selesai, dan mengembalikannya ke aktif kalau salah tekan
+- Menulis item baru lewat kotak di bawah layar
+- Melihat daftar item aktif, menandai selesai, membatalkannya
+- **Tangkap Cepat** — layar kosong berisi textarea besar untuk mendikte di lapangan
+- **Pilah Cepat** — memilah tangkapan lapangan satu per satu dengan tombol besar
+- Pintasan `?capture=1` untuk membuka langsung layar Tangkap Cepat
 - Tampilan mengikuti mode terang/gelap perangkat
+
+### Pintasan Tangkap Cepat di layar utama
+
+Buka `https://<username>.github.io/<repo>/?capture=1` di HP, lalu
+**Tambahkan ke Layar Utama**. Ikon ini langsung membuka layar tangkap
+dengan papan ketik aktif — tombol mikrofon terjangkau dalam satu ketukan.
 
 ## Yang BELUM ada (menyusul di tahap berikutnya)
 
 | Tahap | Isi |
 |---|---|
-| 2 | Layar Tangkap Cepat & Pilah Cepat |
 | 3 | Sintaks `!1 @kerja /besok #tag` + pratinjau |
 | 3b | Skor prioritas + Dashboard |
 | 4 | **Ekspor / impor backup** |

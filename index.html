@@ -28,6 +28,18 @@
     -->
     <section class="layar" id="layar-daftar" data-layar="daftar">
 
+      <!-- Banner antrean pilah (§5.1 a2). Ditaruh paling atas karena selama
+           antrean belum kosong, daftar di bawahnya belum utuh. -->
+      <div class="banner-pilah" id="banner-pilah" hidden>
+        <span id="teks-banner-pilah"></span>
+        <button type="button" class="tombol-teks" data-aksi="buka-pilah">Pilah sekarang →</button>
+      </div>
+
+      <!-- Pintu masuk ke layar Tangkap Cepat (§4.3) -->
+      <button type="button" class="tombol-tangkap" data-aksi="buka-tangkap">
+        ⚡ Tangkap Cepat
+      </button>
+
       <h2 class="judul-bagian">Aktif</h2>
       <ul class="daftar" id="daftar-aktif"></ul>
       <p class="kosong" id="kosong-aktif" hidden>
@@ -41,7 +53,101 @@
       </div>
 
     </section>
+
+    <!-- ================= LAYAR TANGKAP CEPAT (§4.3) =================
+         Sengaja hampir kosong: tidak ada menu, filter, atau daftar.
+         Di lapangan, kecepatan mengalahkan kerapian. -->
+    <section class="layar" id="layar-tangkap" data-layar="tangkap" hidden>
+      <div class="baris-layar">
+        <button type="button" class="tombol-teks" data-aksi="ke-daftar">← Kembali</button>
+      </div>
+
+      <!--
+        <textarea>, bukan <input>, agar hasil dikte yang panjang terlihat penuh.
+        autocapitalize/autocorrect/spellcheck dinyalakan supaya tombol mikrofon
+        bawaan papan ketik bekerja senormal mungkin. TIDAK ada Web Speech API
+        di sini — lihat §7.1.
+      -->
+      <textarea
+        id="teks-tangkap"
+        class="area-tangkap"
+        rows="6"
+        placeholder="Tulis atau tekan tombol mikrofon di papan ketik…"
+        autocapitalize="sentences"
+        autocorrect="on"
+        spellcheck="true"
+        aria-label="Tangkapan cepat"></textarea>
+
+      <button type="button" class="tombol-besar" data-aksi="simpan-tangkap">SIMPAN</button>
+      <button type="button" class="tombol-besar tombol-besar--sekunder" data-aksi="simpan-lagi">
+        Simpan &amp; tambah lagi
+      </button>
+    </section>
+
+    <!-- ================= LAYAR PILAH CEPAT (§4.3) =================
+         Satu item per layar. Semua pilihan berupa tombol besar,
+         bukan dropdown atau date picker. Target: < 5 detik per item. -->
+    <section class="layar" id="layar-pilah" data-layar="pilah" hidden>
+      <div class="baris-layar">
+        <button type="button" class="tombol-teks" data-aksi="ke-daftar">← Kembali</button>
+        <span class="ringkasan" id="sisa-pilah"></span>
+      </div>
+
+      <div id="isi-pilah" hidden>
+        <!-- Judul bisa diedit langsung — hasil dikte sering perlu dirapikan -->
+        <textarea
+          id="judul-pilah"
+          class="judul-pilah"
+          rows="2"
+          autocapitalize="sentences"
+          autocorrect="on"
+          spellcheck="true"
+          aria-label="Judul item"></textarea>
+
+        <p class="tanya">Ini apa?</p>
+        <div class="grup-tombol" id="grup-tipe" data-grup="tipe" role="group" aria-label="Jenis item">
+          <button type="button" class="pilihan" data-nilai="task">Tugas</button>
+          <button type="button" class="pilihan" data-nilai="note">Catatan</button>
+          <button type="button" class="pilihan" data-nilai="event">Agenda</button>
+        </div>
+
+        <p class="tanya">Seberapa penting?</p>
+        <div class="grup-tombol" id="grup-prioritas" data-grup="prioritas" role="group" aria-label="Prioritas">
+          <button type="button" class="pilihan" data-nilai="1">!1</button>
+          <button type="button" class="pilihan" data-nilai="2">!2</button>
+          <button type="button" class="pilihan" data-nilai="3">!3</button>
+        </div>
+
+        <div id="bagian-kapan">
+          <p class="tanya">Kapan?</p>
+          <div class="grup-tombol" id="grup-kapan" data-grup="kapan" role="group" aria-label="Kapan">
+            <button type="button" class="pilihan" data-nilai="hari-ini">Hari ini</button>
+            <button type="button" class="pilihan" data-nilai="besok">Besok</button>
+            <button type="button" class="pilihan" data-nilai="minggu">Minggu</button>
+            <button type="button" class="pilihan" data-nilai="nanti">Nanti</button>
+          </div>
+        </div>
+
+        <p class="tanya">Konteks</p>
+        <div class="grup-tombol" id="grup-konteks" data-grup="konteks" role="group" aria-label="Konteks">
+          <button type="button" class="pilihan" data-nilai="kerja">Kerja</button>
+          <button type="button" class="pilihan" data-nilai="pribadi">Pribadi</button>
+        </div>
+
+        <div class="aksi-pilah">
+          <button type="button" class="tombol-besar" data-aksi="simpan-pilah">Simpan</button>
+          <button type="button" class="tombol-besar tombol-besar--bahaya" data-aksi="hapus-pilah">Hapus</button>
+        </div>
+      </div>
+
+      <p class="kosong" id="pilah-kosong" hidden>
+        Antrean kosong. Semua tangkapan sudah dipilah.
+      </p>
+    </section>
   </main>
+
+  <!-- Pemberitahuan singkat yang hilang sendiri setelah 2 detik -->
+  <div class="toast" id="toast" role="status" hidden></div>
 
   <!-- Kotak capture menempel di bawah layar agar selalu terjangkau ibu jari (§7.3) -->
   <form class="kotak-capture" id="form-capture" autocomplete="off">
@@ -57,7 +163,63 @@
     <button type="submit" class="tombol-simpan" aria-label="Simpan item">Simpan</button>
   </form>
 
+  <!--
+    ===== PENAMPIL KESALAHAN DARURAT =====
+    Ditulis langsung di sini (bukan di berkas js/) supaya tetap berjalan
+    meskipun berkas di folder js/ gagal dimuat. Tanpa ini, kegagalan
+    memuat berkas hanya terlihat sebagai layar diam tanpa keterangan —
+    sulit didiagnosis di HP yang tidak punya alat pengembang.
+  -->
+  <script>
+  (function () {
+    'use strict';
+
+    function tampilkan(pesan) {
+      var kotak = document.getElementById('pesan-kesalahan');
+      if (!kotak) return;
+      kotak.textContent = pesan;
+      kotak.hidden = false;
+    }
+
+    // Menangkap berkas yang gagal dimuat (404).
+    // Argumen ketiga `true` (fase capture) wajib: kegagalan memuat
+    // <script src="..."> tidak menggelembung naik ke window.
+    window.addEventListener('error', function (ev) {
+      if (ev.target && ev.target.tagName === 'SCRIPT') {
+        tampilkan(
+          'Berkas tidak ditemukan: ' + ev.target.getAttribute('src') +
+          ' — periksa lokasi dan penulisan namanya. Huruf besar/kecil berpengaruh di GitHub Pages.'
+        );
+      } else if (ev.message) {
+        tampilkan('Kesalahan kode: ' + ev.message +
+          ' (' + String(ev.filename || '').split('/').pop() + ' baris ' + ev.lineno + ')');
+      }
+    }, true);
+
+    // Menangkap kegagalan yang terjadi di dalam Promise.
+    window.addEventListener('unhandledrejection', function (ev) {
+      var sebab = ev.reason;
+      tampilkan('Kesalahan: ' + ((sebab && sebab.message) ? sebab.message : String(sebab)));
+    });
+
+    // Jaring pengaman terakhir: kalau setelah 2 detik ringkasan masih
+    // bertuliskan "Memuat…", berarti app.js tidak pernah berjalan.
+    window.addEventListener('load', function () {
+      setTimeout(function () {
+        var ringkasan = document.getElementById('ringkasan');
+        if (ringkasan && ringkasan.textContent.indexOf('Memuat') === 0) {
+          tampilkan(
+            'Aplikasi tidak berjalan: js/app.js tidak termuat. ' +
+            'Buka alamat halaman ini diikuti /js/app.js untuk memeriksa apakah berkasnya ada.'
+          );
+        }
+      }, 2000);
+    });
+  })();
+  </script>
+
   <script src="js/db.js"></script>
+  <script src="js/views.js"></script>
   <script src="js/app.js"></script>
 </body>
 </html>
