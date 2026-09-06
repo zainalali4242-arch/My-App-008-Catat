@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <!-- viewport-fit=cover: agar tampilan penuh di HP dengan poni/layar melengkung -->
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <!-- memberi tahu browser aplikasi ini punya versi terang dan gelap -->
+  <meta name="color-scheme" content="light dark">
+  <title>Catat</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <header class="bilah-atas">
+    <h1 class="merek">Catat</h1>
+    <p class="ringkasan" id="ringkasan">Memuat…</p>
+  </header>
+
+  <main class="isi">
+    <!-- Pesan kesalahan. role="alert" agar dibacakan pembaca layar. -->
+    <div class="kesalahan" id="pesan-kesalahan" role="alert" hidden></div>
+
+    <!--
+      Kerangka layar. Tahap 1 hanya punya satu layar.
+      Layar berikutnya (Tangkap Cepat, Pilah Cepat, Dashboard) akan
+      ditambahkan sebagai <section class="layar"> lain lalu
+      ditampilkan/disembunyikan, sesuai §7.2 PRD.
+    -->
+    <section class="layar" id="layar-daftar" data-layar="daftar">
+
+      <h2 class="judul-bagian">Aktif</h2>
+      <ul class="daftar" id="daftar-aktif"></ul>
+      <p class="kosong" id="kosong-aktif" hidden>
+        Belum ada apa-apa. Tulis sesuatu di kotak bawah lalu tekan Enter.
+      </p>
+
+      <div id="bagian-selesai" hidden>
+        <h2 class="judul-bagian">Selesai</h2>
+        <ul class="daftar daftar--selesai" id="daftar-selesai"></ul>
+        <p class="kosong" id="kosong-selesai" hidden>Belum ada yang selesai.</p>
+      </div>
+
+    </section>
+  </main>
+
+  <!-- Kotak capture menempel di bawah layar agar selalu terjangkau ibu jari (§7.3) -->
+  <form class="kotak-capture" id="form-capture" autocomplete="off">
+    <label class="hanya-pembaca-layar" for="input-capture">Tulis tugas baru</label>
+    <input
+      id="input-capture"
+      type="text"
+      placeholder="Tulis lalu tekan Enter…"
+      enterkeyhint="done"
+      autocapitalize="sentences"
+      autocorrect="on"
+      spellcheck="true">
+    <button type="submit" class="tombol-simpan" aria-label="Simpan item">Simpan</button>
+  </form>
+
+  <script src="js/db.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

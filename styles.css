@@ -1,0 +1,235 @@
+/* =====================================================================
+   styles.css — mobile first (acuan lebar 380px), mengikuti tema OS.
+   Semua warna dan ukuran dikumpulkan sebagai variabel di paling atas.
+   ===================================================================== */
+
+/* ---------- KONSTANTA TAMPILAN ---------- */
+:root {
+  --latar:          #faf9f7;
+  --latar-kartu:    #ffffff;
+  --garis:          #e2ddd6;
+  --teks:           #1c1a17;
+  --teks-redup:     #6f6960;
+  --aksen:          #2f6f4e;
+  --aksen-teks:     #ffffff;
+  --bahaya-latar:   #fdecea;
+  --bahaya-teks:    #8a2318;
+
+  --sudut:          10px;
+  --sentuh:         44px;   /* target sentuh minimal (§7.3) */
+  --jeda:           150ms;  /* satu-satunya durasi transisi yang dipakai */
+  --lebar-maks:     640px;
+}
+
+/* Versi gelap. Tanpa tombol manual — murni mengikuti pengaturan OS (§7.3). */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --latar:        #16181a;
+    --latar-kartu:  #202427;
+    --garis:        #33383c;
+    --teks:         #e8e6e3;
+    --teks-redup:   #9aa0a6;
+    --aksen:        #5fb98a;
+    --aksen-teks:   #10241a;
+    --bahaya-latar: #3a1f1c;
+    --bahaya-teks:  #f3b4ad;
+  }
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--latar);
+  color: var(--teks);
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  font-size: 16px;          /* di bawah 16px, iOS ikut memperbesar halaman saat mengetik */
+  line-height: 1.5;
+  /* ruang bawah agar isi terakhir tidak tertutup kotak capture */
+  padding-bottom: calc(96px + env(safe-area-inset-bottom));
+}
+
+/* ---------- BILAH ATAS ---------- */
+.bilah-atas {
+  max-width: var(--lebar-maks);
+  margin: 0 auto;
+  padding: 20px 16px 12px;
+}
+
+.merek {
+  margin: 0;
+  font-size: 22px;
+  letter-spacing: -0.01em;
+}
+
+.ringkasan {
+  margin: 2px 0 0;
+  font-size: 14px;
+  color: var(--teks-redup);
+}
+
+/* ---------- ISI ---------- */
+.isi {
+  max-width: var(--lebar-maks);
+  margin: 0 auto;
+  padding: 0 16px;
+}
+
+.judul-bagian {
+  margin: 20px 0 8px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--teks-redup);
+}
+
+.kosong {
+  margin: 4px 0;
+  font-size: 14px;
+  color: var(--teks-redup);
+}
+
+/* ---------- DAFTAR ---------- */
+.daftar {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.baris {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: var(--sentuh);
+  padding: 10px 12px;
+  margin-bottom: 8px;
+  background: var(--latar-kartu);
+  border: 1px solid var(--garis);
+  border-radius: var(--sudut);
+}
+
+.judul-baris {
+  flex: 1;
+  overflow-wrap: anywhere;   /* teks panjang tanpa spasi tidak merusak tata letak */
+}
+
+.baris--selesai .judul-baris {
+  color: var(--teks-redup);
+  text-decoration: line-through;
+}
+
+/* Lingkaran centang. Terlihat kecil, tapi area sentuhnya diperluas
+   lewat ::before di bawah agar tetap memenuhi 44px. */
+.kotak-centang {
+  position: relative;
+  flex: 0 0 auto;
+  display: grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  padding: 0;
+  background: transparent;
+  border: 2px solid var(--garis);
+  border-radius: 50%;
+  color: var(--aksen);
+  font-size: 15px;
+  line-height: 1;
+  cursor: pointer;
+  transition: border-color var(--jeda) ease;
+}
+
+/* Area sentuh tak terlihat, meluas 9px ke segala arah (26 + 18 = 44px) */
+.kotak-centang::before {
+  content: "";
+  position: absolute;
+  inset: -9px;
+}
+
+.kotak-centang:hover { border-color: var(--aksen); }
+.baris--selesai .kotak-centang { border-color: var(--aksen); }
+
+/* ---------- PESAN KESALAHAN ---------- */
+.kesalahan {
+  margin: 12px 0 0;
+  padding: 12px 14px;
+  background: var(--bahaya-latar);
+  color: var(--bahaya-teks);
+  border-radius: var(--sudut);
+  font-size: 14px;
+}
+
+/* ---------- KOTAK CAPTURE (menempel di bawah) ---------- */
+.kotak-capture {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  gap: 8px;
+  padding: 10px 16px calc(10px + env(safe-area-inset-bottom));
+  background: var(--latar);
+  border-top: 1px solid var(--garis);
+}
+
+/* Pada layar lebar, kotak capture ikut dibatasi lebarnya */
+.kotak-capture > * { min-width: 0; }
+@media (min-width: 672px) {
+  .kotak-capture {
+    max-width: var(--lebar-maks);
+    left: 50%;
+    right: auto;
+    transform: translateX(-50%);
+    border: 1px solid var(--garis);
+    border-radius: var(--sudut) var(--sudut) 0 0;
+  }
+}
+
+#input-capture {
+  flex: 1;
+  min-height: var(--sentuh);
+  padding: 10px 12px;
+  background: var(--latar-kartu);
+  color: var(--teks);
+  border: 1px solid var(--garis);
+  border-radius: var(--sudut);
+  font: inherit;
+}
+
+#input-capture:focus {
+  outline: 2px solid var(--aksen);
+  outline-offset: 1px;
+}
+
+.tombol-simpan {
+  flex: 0 0 auto;
+  min-height: var(--sentuh);
+  padding: 0 18px;
+  background: var(--aksen);
+  color: var(--aksen-teks);
+  border: 0;
+  border-radius: var(--sudut);
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity var(--jeda) ease;
+}
+
+.tombol-simpan:active { opacity: 0.8; }
+
+/* ---------- AKSESIBILITAS ---------- */
+/* Teks yang hanya dibacakan pembaca layar, tidak terlihat di layar */
+.hanya-pembaca-layar {
+  position: absolute;
+  width: 1px; height: 1px;
+  padding: 0; margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+:focus-visible {
+  outline: 2px solid var(--aksen);
+  outline-offset: 2px;
+}
