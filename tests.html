@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light dark">
+  <title>Pengujian — Catat</title>
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    /* Gaya khusus halaman uji, tidak dipakai aplikasi */
+    .hasil { list-style: none; padding: 0; margin: 0; font-size: 14px; }
+    .hasil li { padding: 7px 10px; border-bottom: 1px solid var(--garis); }
+    .lolos::before { content: "OK   "; color: var(--aksen); font-weight: 700; }
+    .gagal { background: var(--bahaya-latar); color: var(--bahaya-teks); }
+    .gagal::before { content: "GAGAL "; font-weight: 700; }
+    .rincian { display: block; margin-top: 3px; font-size: 12px; opacity: 0.85; }
+    .skor { margin: 16px 0; padding: 14px; border-radius: var(--sudut); font-weight: 700; }
+    .skor--baik { background: var(--info-latar); color: var(--info-teks); }
+    .skor--buruk { background: var(--bahaya-latar); color: var(--bahaya-teks); }
+  </style>
+</head>
+<body>
+  <header class="bilah-atas">
+    <h1 class="merek">Pengujian</h1>
+    <p class="ringkasan">Parser &amp; batas tanggal (§10). Uji skor dan cadangan menyusul.</p>
+  </header>
+
+  <main class="isi">
+    <div class="skor" id="skor">Menjalankan…</div>
+    <ul class="hasil" id="hasil"></ul>
+    <p class="kosong">Bisa juga dijalankan dari konsol dengan <code>runTests()</code>.</p>
+  </main>
+
+  <script src="js/parser.js"></script>
+  <script>
+  /* ===================================================================
+     Pengujian wajib §10. Tanpa framework — cukup fungsi biasa.
+     Waktu acuan dibuat tetap supaya hasilnya sama kapan pun dijalankan.
+     =================================================================== */
+  (function () {
+    'use strict';
+
+    // Minggu, 6 September 2026, pukul 10:00
+    var SEKARANG = new Date(2026, 8, 6, 10, 0, 0, 0).getTime();
+
+    var lolos = 0, gagal = 0;
+
+    function catat(nama, benar, rincian) {
+      var li = document.createElement('li');
+      li.className = benar ? 'lolos' : 'gagal';
+      li.textContent = nama;
+      if (!benar && rincian) {
+        var kecil = document.createElement('span');
+        kecil.className = 'rincian';
+        kecil.textContent = 'hasilnya: ' + rincian;
+        li.appendChild(kecil);
+      }
+      document.getElementById('hasil').appendChild(li);
+      benar ? lolos++ : gagal++;
+    }
+
+    /** Menulis epoch sebagai teks yang mudah dibandingkan. */
+    function w(epoch) {
+      if (epoch === null) return 'null';
+      var d = new Date(epoch);
+      function dua(n) { return (n < 10 ? '0' : '') + n; }
+      return d.getFullYear() + '-' + dua(d.getMonth() + 1) + '-' + dua(d.getDate()) +
+             ' ' + dua(d.getHours()) + ':' + dua(d.getMinutes());
+    }
+
+    function u(teks, waktu) {
+      return Parser.uraikan(teks, waktu || SEKARANG);
+    }
+
+    function runTests() {
+      document.getElementById('hasil').textContent = '';
+      lolos = 0; gagal = 0;
+
+      var r;
+
+      // ---------- tanpa token ----------
+      r = u('beli kopi');
+      catat('tanpa token → tugas, prioritas 2, konteks kerja, tanpa tanggal',
+        r.type === 'task' && r.priority === 2 && r.context === 'kerja' &&
+        r.dueAt === null && r.tags.length === 0 && r.adaToken === false,
+        JSON.stringify(r));
+
+      // ---------- semua token sekaligus (contoh §4) ----------
+      r = u('siapkan slide migrasi DB !1 @kerja #meeting /besok /13:00');
+      catat('contoh lengkap PRD terbaca utuh',
+        r.title === 'siapkan slide migrasi DB' && r.priority === 1 &&
+        r.context === 'kerja' && r.tags[0] === 'meeting' &&
+        w(r.dueAt) === '2026-09-07 13:00',
+        r.title + ' | ' + w(r.dueAt));
+
+      // ---------- letak token bebas ----------
+      r = u('!1 @pribadi kirim laporan');
+      catat('token di awal kalimat', r.title === 'kirim laporan' && r.priority === 1 && r.context === 'pribadi', r.title);
+
+      r = u('cek /besok panel gudang');
+      catat('token di tengah kalimat', r.title === 'cek panel gudang' && w(r.dueAt) === '2026-09-07 23:59', r.title);
+
+      // ---------- token tidak dikenal ----------
+      r = u('pakai /xyz dan !9 dan @tetangga ya');
+      catat('token tak dikenal dibiarkan jadi judul, tidak error',
+        r.title === 'pakai /xyz dan !9 dan @tetangga ya' && r.adaToken === false, r.title);
+
+      // ---------- penanda jenis ----------
+      r = u('? ide fitur export');
+      catat('tanda ? menjadikan catatan', r.type === 'note' && r.title === 'ide fitur export', r.type + '|' + r.title);
+
+      r = u('* meeting BE /besok /14:00');
+      catat('tanda * menjadikan agenda dan memakai startAt',
+        r.type === 'event' && r.dueAt === null && w(r.startAt) === '2026-09-07 14:00', w(r.startAt));
+
+      r = u('* upacara /besok');
+      catat('agenda tanpa jam dimulai 00:00', w(r.startAt) === '2026-09-07 00:00', w(r.startAt));
+
+      r = u('laporan /hari ini');
+      catat('tugas tanpa jam jatuh tempo akhir hari', w(r.dueAt) === '2026-09-06 23:59', w(r.dueAt));
+
+      // ---------- tanggal relatif ----------
+      r = u('servis motor /lusa');
+      catat('/lusa = dua hari lagi', w(r.dueAt) === '2026-09-08 23:59', w(r.dueAt));
+
+      // ---------- nama hari ----------
+      r = u('rapat /senin');
+      catat('/senin dari hari Minggu = besok', w(r.dueAt) === '2026-09-07 23:59', w(r.dueAt));
+
+      r = u('libur /minggu');
+      catat('/minggu saat hari ini Minggu = Minggu depan, bukan hari ini', w(r.dueAt) === '2026-09-13 23:59', w(r.dueAt));
+
+      r = u('belanja /sabtu');
+      catat('/sabtu = 12 Sep', w(r.dueAt) === '2026-09-12 23:59', w(r.dueAt));
+
+      // ---------- tanggal spesifik ----------
+      r = u('bayar listrik /27');
+      catat('/27 = tanggal 27 bulan ini', w(r.dueAt) === '2026-09-27 23:59', w(r.dueAt));
+
+      r = u('bayar kos /2');
+      catat('/2 sudah lewat → bulan berikutnya', w(r.dueAt) === '2026-10-02 23:59', w(r.dueAt));
+
+      r = u('tutup buku /31');
+      catat('/31 di bulan berisi 30 hari → melompat ke 31 Okt', w(r.dueAt) === '2026-10-31 23:59', w(r.dueAt));
+
+      r = u('ultah /27-09');
+      catat('/27-09 = 27 September tahun ini', w(r.dueAt) === '2026-09-27 23:59', w(r.dueAt));
+
+      r = u('ultah /01-01');
+      catat('/01-01 sudah lewat → tahun depan', w(r.dueAt) === '2027-01-01 23:59', w(r.dueAt));
+
+      r = u('acara /31-02 nanti');
+      catat('/31-02 tidak ada di kalender → dibiarkan di judul',
+        r.dueAt === null && r.title === 'acara /31-02 nanti', r.title);
+
+      // ---------- jam ----------
+      r = u('telepon klien /09:30');
+      catat('jam tanpa tanggal dianggap hari ini', w(r.dueAt) === '2026-09-06 09:30', w(r.dueAt));
+
+      r = u('rapat /besok /08.15');
+      catat('jam boleh ditulis dengan titik', w(r.dueAt) === '2026-09-07 08:15', w(r.dueAt));
+
+      r = u('cek /25:00 sensor');
+      catat('jam 25:00 tidak masuk akal → dibiarkan di judul',
+        r.dueAt === null && r.title === 'cek /25:00 sensor', r.title);
+
+      // ---------- tag ----------
+      r = u('audit #panel #gudang #q3');
+      catat('tiga tag terbaca semua', r.tags.join(',') === 'panel,gudang,q3' && r.title === 'audit', r.tags.join(','));
+
+      r = u('audit #Panel #panel');
+      catat('tag diseragamkan huruf kecil dan tidak diduplikasi',
+        r.tags.length === 1 && r.tags[0] === 'panel', JSON.stringify(r.tags));
+
+      // ---------- batas tanggal ----------
+      r = u('beres-beres /besok', new Date(2026, 11, 31, 22, 0, 0, 0).getTime());
+      catat('lintas tahun: /besok pada 31 Des → 1 Jan', w(r.dueAt) === '2027-01-01 23:59', w(r.dueAt));
+
+      r = u('cek /besok', new Date(2028, 1, 28, 9, 0, 0, 0).getTime());
+      catat('tahun kabisat: /besok pada 28 Feb 2028 → 29 Feb', w(r.dueAt) === '2028-02-29 23:59', w(r.dueAt));
+
+      r = u('cek /29', new Date(2027, 1, 1, 9, 0, 0, 0).getTime());
+      catat('/29 di Februari bukan kabisat → 29 Maret', w(r.dueAt) === '2027-03-29 23:59', w(r.dueAt));
+
+      r = u('tengah malam /besok', new Date(2026, 8, 6, 23, 59, 30, 0).getTime());
+      catat('lintas tengah malam: dihitung dari tanggal, bukan dari jam', w(r.dueAt) === '2026-09-07 23:59', w(r.dueAt));
+
+      // ---------- lain-lain ----------
+      r = u('!1 /besok');
+      catat('judul boleh kosong setelah token dibuang (ditolak di layar, bukan di parser)',
+        r.title === '' && r.priority === 1, '[' + r.title + ']');
+
+      r = u('  beli    kopi   !3  ');
+      catat('spasi berlebih dirapikan', r.title === 'beli kopi' && r.priority === 3, '[' + r.title + ']');
+
+      r = u('siapkan slide !1 @kerja #meeting /besok /13:00');
+      catat('ringkasan pratinjau memuat semua label',
+        /Tugas · !1 · kerja · #meeting · .*13:00/.test(Parser.ringkas(r)), Parser.ringkas(r));
+
+      // ---------- skor akhir ----------
+      var skor = document.getElementById('skor');
+      skor.textContent = lolos + ' lolos, ' + gagal + ' gagal';
+      skor.className = 'skor ' + (gagal === 0 ? 'skor--baik' : 'skor--buruk');
+      return { lolos: lolos, gagal: gagal };
+    }
+
+    window.runTests = runTests;
+    runTests();
+  })();
+  </script>
+</body>
+</html>

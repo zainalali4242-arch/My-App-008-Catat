@@ -90,6 +90,7 @@
     <section class="layar" id="layar-pilah" data-layar="pilah" hidden>
       <div class="baris-layar">
         <button type="button" class="tombol-teks" data-aksi="ke-daftar">← Kembali</button>
+        <span class="ringkasan" id="judul-kartu"></span>
         <span class="ringkasan" id="sisa-pilah"></span>
       </div>
 
@@ -103,6 +104,21 @@
           autocorrect="on"
           spellcheck="true"
           aria-label="Judul item"></textarea>
+
+        <!-- Kolom isi panjang. Disembunyikan saat memilah supaya
+             target "< 5 detik per item" (§4.3) tidak terganggu. -->
+        <div id="bagian-isi" hidden>
+          <p class="tanya">Isi / catatan</p>
+          <textarea
+            id="isi-item"
+            class="area-isi"
+            rows="5"
+            placeholder="Tulis isi selengkapnya di sini…"
+            autocapitalize="sentences"
+            autocorrect="on"
+            spellcheck="true"
+            aria-label="Isi catatan"></textarea>
+        </div>
 
         <p class="tanya">Ini apa?</p>
         <div class="grup-tombol" id="grup-tipe" data-grup="tipe" role="group" aria-label="Jenis item">
@@ -126,6 +142,10 @@
             <button type="button" class="pilihan" data-nilai="minggu">Minggu</button>
             <button type="button" class="pilihan" data-nilai="nanti">Nanti</button>
           </div>
+          <!-- Saat mengubah item lama, tidak ada tombol yang tersorot.
+               Tanggal yang berlaku ditulis di sini supaya jelas bahwa
+               ia tidak akan berubah kalau tombolnya tidak disentuh. -->
+          <p class="tanggal-berlaku" id="tanggal-berlaku" hidden></p>
         </div>
 
         <p class="tanya">Konteks</p>
@@ -151,16 +171,25 @@
 
   <!-- Kotak capture menempel di bawah layar agar selalu terjangkau ibu jari (§7.3) -->
   <form class="kotak-capture" id="form-capture" autocomplete="off">
+    <!-- Pratinjau hasil pembacaan sintaks, muncul saat mengetik (§4).
+         Tujuannya supaya sintaksnya dipelajari sambil dipakai. -->
+    <div class="pratinjau" id="pratinjau" hidden>
+      <span class="pratinjau-judul" id="pratinjau-judul"></span>
+      <span class="pratinjau-label" id="pratinjau-label"></span>
+    </div>
+
+    <div class="baris-capture">
     <label class="hanya-pembaca-layar" for="input-capture">Tulis tugas baru</label>
     <input
       id="input-capture"
       type="text"
-      placeholder="Tulis lalu tekan Enter…"
+      placeholder="Tulis… coba: rapat !1 /besok"
       enterkeyhint="done"
       autocapitalize="sentences"
       autocorrect="on"
       spellcheck="true">
     <button type="submit" class="tombol-simpan" aria-label="Simpan item">Simpan</button>
+    </div>
   </form>
 
   <!--
@@ -219,6 +248,7 @@
   </script>
 
   <script src="js/db.js"></script>
+  <script src="js/parser.js"></script>
   <script src="js/views.js"></script>
   <script src="js/app.js"></script>
 </body>

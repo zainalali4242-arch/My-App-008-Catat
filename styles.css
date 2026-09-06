@@ -38,6 +38,13 @@
 
 * { box-sizing: border-box; }
 
+/* Mematikan "tarik ke bawah untuk muat ulang" dan efek pantulan di ujung
+   halaman. Tanpa ini, menggulir ke atas di layar Pilah bisa memuat ulang
+   halaman dan menghapus judul yang sedang diedit. */
+html, body {
+  overscroll-behavior-y: contain;
+}
+
 body {
   margin: 0;
   background: var(--latar);
@@ -166,6 +173,7 @@ body {
   right: 0;
   bottom: 0;
   display: flex;
+  flex-direction: column;
   gap: 8px;
   padding: 10px 16px calc(10px + env(safe-area-inset-bottom));
   background: var(--latar);
@@ -363,13 +371,13 @@ body.tanpa-capture { padding-bottom: 24px; }
 
 /* ---------- LAYAR PILAH CEPAT ---------- */
 .judul-pilah {
-  margin-bottom: 4px;
-  font-size: 18px;
+  margin-bottom: 0;
+  font-size: 17px;
   font-weight: 600;
 }
 
 .tanya {
-  margin: 18px 0 8px;
+  margin: 12px 0 6px;
   font-size: 13px;
   font-weight: 600;
   letter-spacing: 0.04em;
@@ -409,7 +417,19 @@ body.tanpa-capture { padding-bottom: 24px; }
   pointer-events: none;
 }
 
-.aksi-pilah { margin-top: 24px; }
+ /* Simpan dan Hapus berdampingan (sesuai sketsa §4.3), bukan bertumpuk.
+    Menghemat sekitar 68px tinggi — cukup untuk membuat seluruh kartu
+    muat dalam satu layar HP tanpa perlu digulir. */
+.aksi-pilah {
+  display: flex;
+  gap: 8px;
+  margin-top: 18px;
+}
+
+.aksi-pilah .tombol-besar {
+  flex: 1;
+  margin-top: 0;
+}
 
 /* ---------- PENANDA & TOAST ---------- */
 .tanda-belum-dipilah {
@@ -435,4 +455,98 @@ body.tanpa-capture { padding-bottom: 24px; }
   border-radius: 999px;
   font-size: 14px;
   text-align: center;
+}
+
+
+/* ---------- PRATINJAU HASIL PEMBACAAN SINTAKS (§4) ---------- */
+.baris-capture {
+  display: flex;
+  gap: 8px;
+}
+
+.baris-capture > * { min-width: 0; }
+
+.pratinjau {
+  padding: 8px 12px;
+  background: var(--latar-kartu);
+  border: 1px solid var(--garis);
+  border-radius: var(--sudut);
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.pratinjau-judul {
+  display: block;
+  color: var(--teks);
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+.pratinjau-label {
+  display: block;
+  margin-top: 2px;
+  color: var(--teks-redup);
+}
+
+/* =====================================================================
+   MODE UBAH — baris daftar yang bisa diketuk, kolom isi, keterangan tanggal
+   ===================================================================== */
+
+/* Judul di daftar kini berupa tombol. Digambar agar tetap terlihat
+   seperti teks biasa, bukan tombol. */
+.isi-baris {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+  padding: 0;
+  background: none;
+  border: 0;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.judul-baris {
+  overflow-wrap: anywhere;
+}
+
+/* Cuplikan isi catatan, dipotong maksimal dua baris */
+.cuplikan-isi {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  color: var(--teks-redup);
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.area-isi {
+  display: block;
+  width: 100%;
+  padding: 12px;
+  background: var(--latar-kartu);
+  color: var(--teks);
+  border: 1px solid var(--garis);
+  border-radius: var(--sudut);
+  font: inherit;
+  font-size: 15px;
+  line-height: 1.5;
+  resize: vertical;
+}
+
+.area-isi:focus {
+  outline: 2px solid var(--aksen);
+  outline-offset: 1px;
+}
+
+.tanggal-berlaku {
+  margin: 8px 0 0;
+  font-size: 13px;
+  line-height: 1.4;
+  color: var(--teks-redup);
 }
