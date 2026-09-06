@@ -38,6 +38,14 @@
 
 * { box-sizing: border-box; }
 
+/* WAJIB ADA, jangan dihapus.
+   Browser punya aturan bawaan [hidden] { display: none }, tetapi aturan
+   buatan kita seperti .kotak-capture { display: flex } punya kekuatan
+   yang sama dan SELALU menang atas aturan bawaan browser. Akibatnya
+   elemen yang disembunyikan lewat JavaScript tetap tampil di layar.
+   !important di sini memastikan hidden benar-benar menyembunyikan. */
+[hidden] { display: none !important; }
+
 /* Mematikan "tarik ke bawah untuk muat ulang" dan efek pantulan di ujung
    halaman. Tanpa ini, menggulir ke atas di layar Pilah bisa memuat ulang
    halaman dan menghapus judul yang sedang diedit. */
@@ -261,7 +269,7 @@ body {
 
 /* Saat berada di layar selain daftar, kotak capture bawah disembunyikan,
    jadi ruang kosong di bawah halaman tidak diperlukan lagi. */
-body.tanpa-capture { padding-bottom: 24px; }
+body.tanpa-capture { padding-bottom: calc(28px + env(safe-area-inset-bottom)); }
 
 /* ---------- BANNER ANTREAN PILAH ---------- */
 .banner-pilah {
