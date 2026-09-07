@@ -31,7 +31,9 @@
     <p class="kosong">Bisa juga dijalankan dari konsol dengan <code>runTests()</code>.</p>
   </main>
 
+  <script src="js/config.js"></script>
   <script src="js/parser.js"></script>
+  <script src="js/score.js"></script>
   <script>
   /* ===================================================================
      Pengujian wajib §10. Tanpa framework — cukup fungsi biasa.
@@ -196,6 +198,55 @@
       r = u('siapkan slide !1 @kerja #meeting /besok /13:00');
       catat('ringkasan pratinjau memuat semua label',
         /Tugas · !1 · kerja · #meeting · .*13:00/.test(Parser.ringkas(r)), Parser.ringkas(r));
+
+      // =========================================================
+      // RUMUS SKOR (§5.2 / §10.2)
+      // =========================================================
+      var HARI = 24 * 60 * 60 * 1000;
+
+      // Item contoh; SEKARANG dipakai sebagai waktu pembuatan agar usia 0
+      function item(ubahan) {
+        return Object.assign({
+          type: 'task', priority: 2, dueAt: null, startAt: null,
+          createdAt: SEKARANG, snoozeCount: 0
+        }, ubahan);
+      }
+      function skor(ubahan, waktu) {
+        return Skor.hitungSkor(item(ubahan), waktu || SEKARANG);
+      }
+
+      catat('skor: !1 tanpa tenggat, baru dibuat = 100', skor({ priority: 1 }) === 100, skor({ priority: 1 }));
+      catat('skor: !2 tanpa tenggat = 60', skor({}) === 60, skor({}));
+      catat('skor: !3 tanpa tenggat = 30', skor({ priority: 3 }) === 30, skor({ priority: 3 }));
+      catat('skor: jatuh tempo hari ini = +60', skor({ dueAt: SEKARANG }) === 120, skor({ dueAt: SEKARANG }));
+      catat('skor: besok = +40', skor({ dueAt: SEKARANG + HARI }) === 100, skor({ dueAt: SEKARANG + HARI }));
+      catat('skor: 3 hari lagi = +20', skor({ dueAt: SEKARANG + 3 * HARI }) === 80, skor({ dueAt: SEKARANG + 3 * HARI }));
+      catat('skor: 7 hari lagi masih +20', skor({ dueAt: SEKARANG + 7 * HARI }) === 80, skor({ dueAt: SEKARANG + 7 * HARI }));
+      catat('skor: 8 hari lagi turun jadi +5', skor({ dueAt: SEKARANG + 8 * HARI }) === 65, skor({ dueAt: SEKARANG + 8 * HARI }));
+      catat('skor: terlambat 1 hari = +85', skor({ dueAt: SEKARANG - HARI }) === 145, skor({ dueAt: SEKARANG - HARI }));
+      catat('skor: terlambat 5 hari = +105', skor({ dueAt: SEKARANG - 5 * HARI }) === 165, skor({ dueAt: SEKARANG - 5 * HARI }));
+      catat('skor: keterlambatan berhenti bertambah di +120', skor({ dueAt: SEKARANG - 60 * HARI }) === 180, skor({ dueAt: SEKARANG - 60 * HARI }));
+      catat('skor: usia menambah 1 per hari', skor({ createdAt: SEKARANG - 7 * HARI }) === 67, skor({ createdAt: SEKARANG - 7 * HARI }));
+      catat('skor: usia berhenti bertambah di 20', skor({ createdAt: SEKARANG - 90 * HARI }) === 80, skor({ createdAt: SEKARANG - 90 * HARI }));
+      catat('skor: agenda memakai startAt', skor({ type: 'event', startAt: SEKARANG }) === 120, skor({ type: 'event', startAt: SEKARANG }));
+      catat('skor: !1 terlambat mengalahkan !1 hari ini',
+        skor({ priority: 1, dueAt: SEKARANG - HARI }) > skor({ priority: 1, dueAt: SEKARANG }));
+      catat('skor: !3 sangat terlambat bisa mengalahkan !1 tanpa tenggat',
+        skor({ priority: 3, dueAt: SEKARANG - 10 * HARI }) > skor({ priority: 1 }),
+        skor({ priority: 3, dueAt: SEKARANG - 10 * HARI }) + ' vs ' + skor({ priority: 1 }));
+
+      catat('selisihHari: lintas tengah malam dihitung 1 hari',
+        Skor.selisihHari(new Date(2026, 8, 7, 0, 30).getTime(), new Date(2026, 8, 6, 23, 30).getTime()) === 1);
+      catat('selisihHari: lintas bulan',
+        Skor.selisihHari(new Date(2026, 9, 1).getTime(), new Date(2026, 8, 30).getTime()) === 1);
+      catat('selisihHari: lintas tahun',
+        Skor.selisihHari(new Date(2027, 0, 1).getTime(), new Date(2026, 11, 31).getTime()) === 1);
+
+      catat('kelompokWaktu membedakan terlambat / hari ini / mendatang / tanpa tanggal',
+        Skor.kelompokWaktu(item({ dueAt: SEKARANG - HARI }), SEKARANG) === 'terlambat' &&
+        Skor.kelompokWaktu(item({ dueAt: SEKARANG }), SEKARANG) === 'hari-ini' &&
+        Skor.kelompokWaktu(item({ dueAt: SEKARANG + HARI }), SEKARANG) === 'mendatang' &&
+        Skor.kelompokWaktu(item({}), SEKARANG) === 'tanpa-tanggal');
 
       // ---------- skor akhir ----------
       var skor = document.getElementById('skor');

@@ -558,3 +558,238 @@ body.tanpa-capture { padding-bottom: calc(28px + env(safe-area-inset-bottom)); }
   line-height: 1.4;
   color: var(--teks-redup);
 }
+
+/* =====================================================================
+   TAHAP 3b–5 — navigasi, dashboard, filter, catatan, pengaturan
+   ===================================================================== */
+
+:root {
+  --peringatan-latar: #fdf4dd;
+  --peringatan-teks:  #7a5806;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --peringatan-latar: #3a2f14;
+    --peringatan-teks:  #e8c877;
+  }
+}
+
+/* ---------- NAVIGASI ---------- */
+.navigasi {
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  display: flex;
+  gap: 4px;
+  max-width: var(--lebar-maks);
+  margin: 0 auto;
+  padding: 4px 12px 8px;
+  background: var(--latar);
+}
+
+.tab {
+  flex: 1;
+  min-height: 38px;
+  padding: 0 6px;
+  background: transparent;
+  color: var(--teks-redup);
+  border: 1px solid transparent;
+  border-radius: var(--sudut);
+  font: inherit;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.tab--aktif {
+  background: var(--latar-kartu);
+  color: var(--teks);
+  border-color: var(--garis);
+  font-weight: 600;
+}
+
+/* ---------- DASHBOARD ---------- */
+.judul-bagian--bahaya { color: var(--bahaya-teks); }
+
+.kartu-fokus {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 14px;
+  margin-bottom: 8px;
+  background: var(--latar-kartu);
+  border: 1px solid var(--garis);
+  border-left: 3px solid var(--aksen);
+  border-radius: var(--sudut);
+}
+
+.judul-kartu-fokus {
+  font-size: 16px;
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+/* Alasan skor ditampilkan supaya urutannya bisa dibantah, bukan disihir */
+.alasan-skor {
+  color: var(--teks-redup);
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+.kotak-tinjau {
+  margin-top: 20px;
+  padding: 12px 14px 4px;
+  background: var(--peringatan-latar);
+  border-radius: var(--sudut);
+}
+
+.kotak-tinjau .judul-bagian { margin-top: 4px; color: var(--peringatan-teks); }
+.kotak-tinjau .baris { background: transparent; border-color: transparent; }
+
+.banner-backup {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 12px;
+  padding: 12px 14px;
+  background: var(--peringatan-latar);
+  color: var(--peringatan-teks);
+  border-radius: var(--sudut);
+  font-size: 14px;
+}
+
+.aksi-banner { display: flex; gap: 4px; flex: 0 0 auto; }
+.banner-backup .tombol-teks { color: var(--peringatan-teks); }
+
+.ringkasan-minggu {
+  margin: 24px 0 0;
+  font-size: 14px;
+  color: var(--teks-redup);
+}
+
+/* ---------- AKSI CEPAT PER BARIS ---------- */
+.aksi-cepat {
+  flex: 0 0 auto;
+  display: flex;
+  gap: 2px;
+}
+
+.tombol-kecil {
+  min-width: 34px;
+  min-height: var(--sentuh);
+  padding: 0 4px;
+  background: transparent;
+  color: var(--teks-redup);
+  border: 0;
+  border-radius: var(--sudut);
+  font: inherit;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.tombol-kecil:hover { color: var(--aksen); }
+
+/* ---------- FILTER ---------- */
+.panel-filter { margin-top: 12px; }
+
+.kotak-cari {
+  display: block;
+  width: 100%;
+  min-height: var(--sentuh);
+  padding: 10px 12px;
+  background: var(--latar-kartu);
+  color: var(--teks);
+  border: 1px solid var(--garis);
+  border-radius: var(--sudut);
+  font: inherit;
+}
+
+.baris-filter {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.baris-filter select {
+  flex: 1 1 auto;
+  min-width: 44%;
+  min-height: 40px;
+  padding: 0 8px;
+  background: var(--latar-kartu);
+  color: var(--teks);
+  border: 1px solid var(--garis);
+  border-radius: var(--sudut);
+  font: inherit;
+  font-size: 14px;
+}
+
+/* ---------- CATATAN ---------- */
+.kartu-catatan {
+  padding: 14px;
+  margin-bottom: 8px;
+  background: var(--latar-kartu);
+  border: 1px solid var(--garis);
+  border-radius: var(--sudut);
+}
+
+.isi-kartu-catatan {
+  margin-top: 6px;
+  color: var(--teks-redup);
+  font-size: 14px;
+  line-height: 1.5;
+  white-space: pre-wrap;      /* baris baru dalam catatan tetap terlihat */
+  overflow-wrap: anywhere;
+}
+
+.kaki-kartu {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 10px;
+  padding-top: 8px;
+  border-top: 1px solid var(--garis);
+}
+
+/* ---------- PENGATURAN ---------- */
+.keterangan {
+  margin: 0 0 10px;
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--teks-redup);
+}
+
+.kotak-pratinjau-impor {
+  margin-top: 12px;
+  padding: 12px 14px;
+  background: var(--info-latar);
+  color: var(--info-teks);
+  border-radius: var(--sudut);
+  font-size: 14px;
+}
+
+.baris-bobot {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.baris-bobot label { font-weight: 600; }
+
+.baris-bobot input {
+  flex: 1;
+  min-width: 0;
+  min-height: var(--sentuh);
+  padding: 0 10px;
+  background: var(--latar-kartu);
+  color: var(--teks);
+  border: 1px solid var(--garis);
+  border-radius: var(--sudut);
+  font: inherit;
+}
+
+/* Label yang berperan sebagai tombol pemilih berkas */
+label.tombol-besar { text-align: center; line-height: var(--tombol-besar); }
+
+button:disabled { opacity: 0.45; cursor: not-allowed; }

@@ -16,6 +16,13 @@
     <p class="ringkasan" id="ringkasan">Memuat…</p>
   </header>
 
+  <nav class="navigasi" id="navigasi-wadah" aria-label="Perpindahan layar">
+    <button type="button" class="tab" data-tujuan="layar-beranda">Beranda</button>
+    <button type="button" class="tab" data-tujuan="layar-daftar">Daftar</button>
+    <button type="button" class="tab" data-tujuan="layar-catatan">Catatan</button>
+    <button type="button" class="tab" data-tujuan="layar-pengaturan">Atur</button>
+  </nav>
+
   <main class="isi">
     <!-- Pesan kesalahan. role="alert" agar dibacakan pembaca layar. -->
     <div class="kesalahan" id="pesan-kesalahan" role="alert" hidden></div>
@@ -26,32 +33,177 @@
       ditambahkan sebagai <section class="layar"> lain lalu
       ditampilkan/disembunyikan, sesuai §7.2 PRD.
     -->
-    <section class="layar" id="layar-daftar" data-layar="daftar">
+    <!-- ================= BERANDA / DASHBOARD (§5.1) =================
+         Satu layar yang menjawab "apa yang harus dikerjakan sekarang". -->
+    <section class="layar" id="layar-beranda" data-layar="beranda">
 
-      <!-- Banner antrean pilah (§5.1 a2). Ditaruh paling atas karena selama
-           antrean belum kosong, daftar di bawahnya belum utuh. -->
+      <!-- §6 — pengingat cadangan, muncul kalau sudah lewat 7 hari -->
+      <div class="banner-backup" id="banner-backup" hidden>
+        <span id="teks-banner-backup"></span>
+        <span class="aksi-banner">
+          <button type="button" class="tombol-teks" data-aksi="ekspor">Unduh</button>
+          <button type="button" class="tombol-teks" data-aksi="tutup-banner-backup" aria-label="Tutup pengingat">✕</button>
+        </span>
+      </div>
+
+      <!-- a2 — antrean pilah, di atas segalanya karena item yang belum
+           dipilah tidak masuk perhitungan skor -->
       <div class="banner-pilah" id="banner-pilah" hidden>
         <span id="teks-banner-pilah"></span>
         <button type="button" class="tombol-teks" data-aksi="buka-pilah">Pilah sekarang →</button>
       </div>
 
-      <!-- Pintu masuk ke layar Tangkap Cepat (§4.3) -->
       <button type="button" class="tombol-tangkap" data-aksi="buka-tangkap">
         ⚡ Tangkap Cepat
       </button>
 
-      <h2 class="judul-bagian">Aktif</h2>
-      <ul class="daftar" id="daftar-aktif"></ul>
-      <p class="kosong" id="kosong-aktif" hidden>
-        Belum ada apa-apa. Tulis sesuatu di kotak bawah lalu tekan Enter.
-      </p>
+      <!-- b — Fokus Sekarang, maksimal 3 kartu -->
+      <h2 class="judul-bagian">Fokus sekarang</h2>
+      <div id="fokus-sekarang"></div>
+      <p class="kosong" id="fokus-kosong" hidden>Tidak ada tugas aktif. Layar bersih.</p>
 
-      <div id="bagian-selesai" hidden>
-        <h2 class="judul-bagian">Selesai</h2>
-        <ul class="daftar daftar--selesai" id="daftar-selesai"></ul>
-        <p class="kosong" id="kosong-selesai" hidden>Belum ada yang selesai.</p>
+      <!-- c — Agenda hari ini -->
+      <h2 class="judul-bagian">Agenda hari ini</h2>
+      <ul class="daftar" id="agenda-hari-ini"></ul>
+      <p class="kosong" id="agenda-kosong" hidden>Tidak ada agenda hari ini.</p>
+
+      <!-- d — Terlambat, hanya muncul kalau ada -->
+      <div id="bagian-terlambat" hidden>
+        <h2 class="judul-bagian judul-bagian--bahaya">Terlambat</h2>
+        <ul class="daftar" id="daftar-terlambat"></ul>
       </div>
 
+      <!-- e — Sisa hari ini -->
+      <div id="bagian-sisa-hari-ini" hidden>
+        <h2 class="judul-bagian">Sisa hari ini</h2>
+        <ul class="daftar" id="daftar-sisa-hari-ini"></ul>
+      </div>
+
+      <!-- f — Perlu ditinjau, mencegah aplikasi jadi kuburan tugas -->
+      <div class="kotak-tinjau" id="bagian-tinjau" hidden>
+        <h2 class="judul-bagian">Perlu ditinjau</h2>
+        <ul class="daftar" id="daftar-tinjau"></ul>
+      </div>
+
+      <!-- g — Ringkasan minggu ini -->
+      <p class="ringkasan-minggu" id="ringkasan-minggu"></p>
+
+      <!-- h -->
+      <button type="button" class="tombol-besar tombol-besar--sekunder" data-aksi="salin-ringkasan">
+        Salin ringkasan
+      </button>
+    </section>
+
+    <section class="layar" id="layar-daftar" data-layar="daftar" hidden>
+
+      <!-- Filter dan pencarian (§5.3) -->
+      <div class="panel-filter">
+        <input type="search" id="cari" class="kotak-cari" placeholder="Cari judul atau isi…"
+               autocomplete="off" aria-label="Cari">
+        <div class="baris-filter">
+          <select id="filter-tipe" aria-label="Filter tipe">
+            <option value="">Semua tipe</option>
+            <option value="task">Tugas</option>
+            <option value="note">Catatan</option>
+            <option value="event">Agenda</option>
+          </select>
+          <select id="filter-konteks" aria-label="Filter konteks">
+            <option value="">Semua konteks</option>
+            <option value="kerja">Kerja</option>
+            <option value="pribadi">Pribadi</option>
+          </select>
+          <select id="filter-status" aria-label="Filter status">
+            <option value="aktif">Aktif</option>
+            <option value="selesai">Selesai</option>
+            <option value="">Semua status</option>
+          </select>
+          <select id="filter-prioritas" aria-label="Filter prioritas">
+            <option value="">Semua prioritas</option>
+            <option value="1">!1</option>
+            <option value="2">!2</option>
+            <option value="3">!3</option>
+          </select>
+          <select id="filter-waktu" aria-label="Filter rentang tanggal">
+            <option value="">Kapan saja</option>
+            <option value="terlambat">Terlambat</option>
+            <option value="hari-ini">Hari ini</option>
+            <option value="minggu">7 hari ke depan</option>
+            <option value="tanpa-tanggal">Tanpa tanggal</option>
+          </select>
+          <select id="urut" aria-label="Urutkan">
+            <option value="skor">Urut: skor</option>
+            <option value="tenggat">Urut: jatuh tempo</option>
+            <option value="diubah">Urut: terakhir diubah</option>
+          </select>
+        </div>
+        <button type="button" class="tombol-teks" data-aksi="reset-filter">Bersihkan filter</button>
+      </div>
+
+      <p class="ringkasan" id="hasil-filter"></p>
+      <ul class="daftar" id="daftar-aktif"></ul>
+      <p class="kosong" id="kosong-aktif" hidden>
+        Tidak ada yang cocok. Coba bersihkan filter.
+      </p>
+
+    </section>
+
+    <!-- ================= CATATAN & IDE (§5.4) ================= -->
+    <section class="layar" id="layar-catatan" data-layar="catatan" hidden>
+      <h2 class="judul-bagian">Catatan &amp; ide</h2>
+      <div id="kartu-catatan"></div>
+      <p class="kosong" id="catatan-kosong" hidden>
+        Belum ada catatan. Awali tangkapan dengan tanda ? untuk membuatnya.
+      </p>
+    </section>
+
+    <!-- ================= PENGATURAN (§5.5) ================= -->
+    <section class="layar" id="layar-pengaturan" data-layar="pengaturan" hidden>
+
+      <h2 class="judul-bagian">Cadangan data</h2>
+      <p class="keterangan" id="status-backup"></p>
+      <button type="button" class="tombol-besar" data-aksi="ekspor">Unduh cadangan</button>
+
+      <label class="tombol-besar tombol-besar--sekunder" for="berkas-impor">Pilih berkas cadangan…</label>
+      <input type="file" id="berkas-impor" accept="application/json,.json" class="hanya-pembaca-layar">
+
+      <div class="kotak-pratinjau-impor" id="pratinjau-impor" hidden>
+        <p id="teks-pratinjau-impor"></p>
+        <div class="aksi-pilah">
+          <button type="button" class="tombol-besar" data-aksi="impor-gabung">Gabungkan</button>
+          <button type="button" class="tombol-besar tombol-besar--bahaya" data-aksi="impor-ganti">Ganti semua</button>
+        </div>
+      </div>
+
+      <h2 class="judul-bagian">Status penyimpanan</h2>
+      <p class="keterangan" id="status-penyimpanan"></p>
+
+      <h2 class="judul-bagian">Bobot skor prioritas</h2>
+      <p class="keterangan">
+        Makin besar angkanya, makin tinggi item itu naik di Fokus Sekarang.
+        Ubah kalau urutan yang muncul terasa tidak sesuai kenyataan.
+      </p>
+      <div class="baris-bobot">
+        <label for="bobot-1">!1</label>
+        <input type="number" id="bobot-1" min="0" max="999" inputmode="numeric">
+        <label for="bobot-2">!2</label>
+        <input type="number" id="bobot-2" min="0" max="999" inputmode="numeric">
+        <label for="bobot-3">!3</label>
+        <input type="number" id="bobot-3" min="0" max="999" inputmode="numeric">
+      </div>
+      <div class="aksi-pilah">
+        <button type="button" class="tombol-besar" data-aksi="simpan-bobot">Simpan bobot</button>
+        <button type="button" class="tombol-besar tombol-besar--sekunder" data-aksi="bobot-bawaan">Kembalikan bawaan</button>
+      </div>
+
+      <h2 class="judul-bagian judul-bagian--bahaya">Hapus semua data</h2>
+      <p class="keterangan">
+        Menghapus seluruh item dari perangkat ini secara permanen.
+        Unduh cadangan dulu. Ketik HAPUS untuk mengaktifkan tombolnya.
+      </p>
+      <input type="text" id="konfirmasi-hapus" class="kotak-cari" placeholder="Ketik HAPUS" aria-label="Konfirmasi hapus">
+      <button type="button" class="tombol-besar tombol-besar--bahaya" data-aksi="hapus-semua" disabled>
+        Hapus semua data
+      </button>
     </section>
 
     <!-- ================= LAYAR TANGKAP CEPAT (§4.3) =================
@@ -248,7 +400,10 @@
   </script>
 
   <script src="js/db.js"></script>
+  <script src="js/config.js"></script>
   <script src="js/parser.js"></script>
+  <script src="js/score.js"></script>
+  <script src="js/backup.js"></script>
   <script src="js/views.js"></script>
   <script src="js/app.js"></script>
 </body>

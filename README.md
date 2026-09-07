@@ -3,7 +3,7 @@
 Pencatat agenda & task sederhana. Web statis, tanpa server, tanpa akun.
 Data disimpan di IndexedDB — **hanya di browser perangkat ini**, tidak pernah dikirim ke mana pun.
 
-Status saat ini: **Tahap 3 selesai** (lihat §8 PRD).
+Status saat ini: **Tahap 5 selesai** (lihat §8 PRD). Tersisa Tahap 6.
 
 ---
 
@@ -17,6 +17,13 @@ Status saat ini: **Tahap 3 selesai** (lihat §8 PRD).
 - **Ubah item** — ketuk judul di daftar untuk memperbaiki judul, isi, tipe,
   prioritas, tanggal, konteks, atau menghapusnya
 - **Isi catatan panjang** (`body`), tampil sebagai cuplikan dua baris di daftar
+- **Beranda** — fokus sekarang, agenda, terlambat, perlu ditinjau, ringkasan minggu
+- **Skor prioritas** deterministik, dengan alasan skor tertulis di tiap kartu
+- **Daftar** — filter tipe/konteks/status/prioritas/waktu, pencarian, tiga cara urut
+- **Aksi cepat per baris** — selesai, tunda 1 hari, putar prioritas, hapus
+- **Catatan & Ide** — tampilan kartu, tombol "Jadikan task"
+- **Ekspor / impor cadangan** + pengingat backup 7 hari
+- **Pengaturan** — status penyimpanan, ubah bobot skor, hapus semua data
 - Tangkapan lapangan yang sudah mengandung token tidak masuk antrean pilah
 - Pintasan `?capture=1` untuk membuka langsung layar Tangkap Cepat
 - Tampilan mengikuti mode terang/gelap perangkat
@@ -31,17 +38,15 @@ dengan papan ketik aktif — tombol mikrofon terjangkau dalam satu ketukan.
 
 | Tahap | Isi |
 |---|---|
-| 3b | Skor prioritas + Dashboard |
-| 4 | **Ekspor / impor backup** |
-| 5 | Catatan & ide, filter, pencarian |
 | 6 | manifest, service worker, poles tampilan |
 
 > Catatan: fitur Ubah item dan isi catatan panjang berada di luar PRD asli.
 > Ditambahkan atas permintaan setelah pemakaian nyata menunjukkan bahwa
 > kesalahan dikte tidak bisa diperbaiki sama sekali.
 
-> ⚠️ Sampai Tahap 4 selesai, **belum ada fitur backup**. Jangan menaruh
-> data penting dulu. Bersih-bersih riwayat browser akan menghapus semuanya.
+> ⚠️ Cadangan kini tersedia di **Atur → Unduh cadangan**. Ini satu-satunya
+> perlindungan terhadap kehilangan data. Unduh setidaknya seminggu sekali —
+> aplikasi akan mengingatkan lewat banner kuning kalau lewat 7 hari.
 
 ---
 
@@ -54,7 +59,10 @@ dengan papan ketik aktif — tombol mikrofon terjangkau dalam satu ketukan.
 ├── tests.html      — pengujian parser & tanggal (buka di browser)
 ├── js/
 │   ├── db.js       — satu-satunya file yang menyentuh IndexedDB
+│   ├── config.js   — semua angka bobot & ambang, di satu tempat
 │   ├── parser.js   — pembaca sintaks singkat
+│   ├── score.js    — rumus prioritas
+│   ├── backup.js   — ekspor / impor
 │   ├── views.js    — penggambar tampilan
 │   └── app.js      — pengatur alur layar & event handler
 └── README.md
