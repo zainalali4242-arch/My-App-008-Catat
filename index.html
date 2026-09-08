@@ -294,9 +294,16 @@
             <button type="button" class="pilihan" data-nilai="minggu">Minggu</button>
             <button type="button" class="pilihan" data-nilai="nanti">Nanti</button>
           </div>
-          <!-- Saat mengubah item lama, tidak ada tombol yang tersorot.
-               Tanggal yang berlaku ditulis di sini supaya jelas bahwa
-               ia tidak akan berubah kalau tombolnya tidak disentuh. -->
+          <!-- Hanya di mode Ubah. Tombol di atas berubah peran jadi
+               pintasan yang mengisi kolom ini; yang tersimpan selalu
+               apa yang terlihat di sini. Memungkinkan tanggal masa lalu,
+               yang tidak bisa dinyatakan oleh empat tombol itu. -->
+          <div class="baris-tanggal" id="baris-tanggal" hidden>
+            <input type="date" id="tanggal-item" aria-label="Tanggal">
+            <input type="time" id="jam-item" aria-label="Jam">
+            <button type="button" class="tombol-kecil" data-aksi="kosongkan-tanggal"
+                    aria-label="Kosongkan tanggal">✕</button>
+          </div>
           <p class="tanggal-berlaku" id="tanggal-berlaku" hidden></p>
         </div>
 

@@ -75,13 +75,18 @@ Layar kartu dipakai untuk dua hal berbeda:
 |---|---|---|
 | Dibuka dari | Banner antrean | Ketuk judul di daftar |
 | Kolom isi | Disembunyikan | Ditampilkan |
-| Tombol Kapan | "Nanti" tersorot | Tidak ada yang tersorot |
+| Tombol Kapan | "Nanti" tersorot | Jadi pintasan pengisi kolom tanggal |
+| Pemilih tanggal & jam | Tidak ada | Ada — termasuk tanggal masa lalu |
 | Setelah Simpan | Lanjut item berikutnya | Kembali ke daftar |
 | Hapus | Langsung | Minta konfirmasi |
 
-Di mode Ubah, tanggal **tidak berubah** selama tombol "Kapan?" tidak
-disentuh. Ini penting: tanggal seperti 27 Sep tidak bisa diwakili oleh
-empat tombol itu, jadi menyorot salah satunya akan menimpanya.
+Di mode Ubah, yang tersimpan selalu **isi kolom tanggal**, bukan tombol
+yang tersorot. Empat tombol itu tidak bisa menyatakan tanggal masa lalu
+atau tanggal sembarang, jadi kolomlah yang jadi sumber kebenaran.
+
+Mode Pilah sengaja tidak punya pemilih tanggal: §4.3 menargetkan
+di bawah 5 detik per item, dan memilih tanggal di HP terlalu lambat
+untuk itu.
 
 ## Sintaks singkat
 
@@ -96,6 +101,11 @@ empat tombol itu, jadi menyorot salah satunya akan menimpanya.
 | `/14:00` | Jam |
 | `?` di awal | Jadikan catatan |
 | `*` di awal | Jadikan agenda |
+
+Agenda butuh **dua** hal untuk muncul di "Agenda hari ini" pada Beranda:
+tanda `*` di awal **dan** token tanggal. `* rapat vendor` saja menghasilkan
+agenda tanpa tanggal, yang hanya terlihat di tab Daftar. Pratinjau akan
+memperingatkan kalau ini terjadi.
 
 Token yang tidak dikenali dibiarkan jadi bagian judul, bukan error.
 

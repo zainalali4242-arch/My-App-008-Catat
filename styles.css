@@ -793,3 +793,30 @@ body.tanpa-capture { padding-bottom: calc(28px + env(safe-area-inset-bottom)); }
 label.tombol-besar { text-align: center; line-height: var(--tombol-besar); }
 
 button:disabled { opacity: 0.45; cursor: not-allowed; }
+
+/* Pemilih tanggal & jam di kartu mode Ubah */
+.baris-tanggal {
+  display: flex;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.baris-tanggal input {
+  flex: 1;
+  min-width: 0;
+  min-height: var(--sentuh);
+  padding: 0 10px;
+  background: var(--latar-kartu);
+  color: var(--teks);
+  border: 1px solid var(--garis);
+  border-radius: var(--sudut);
+  font: inherit;
+  font-size: 15px;
+}
+
+.baris-tanggal input:focus {
+  outline: 2px solid var(--aksen);
+  outline-offset: 1px;
+}
+
+.baris-tanggal .tombol-kecil { flex: 0 0 auto; }
